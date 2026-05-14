@@ -63,14 +63,7 @@ jobs:
       - name: Send Slack Notification
         if: always()
         run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data '{
-            "attachments": [
-              {
-                "color": "'${{ env.COLOR }}'",
-                "title": "🧪 Playwright Test Execution",
-                "text": "Result: ${{ env.STATUS }}\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\n\nGitHub Actions Run:\nhttps://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-              }
-            ]
-          }' \
+          curl -X POST \
+          -H 'Content-type: application/json' \
+          --data '{"text":"✅ Playwright Tests Passed"}' \
           ${{ secrets.SLACK_WEBHOOK_URL }}
