@@ -41,3 +41,5 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+      - name: Run tests
+        run: npx playwright test --reporter=json > results.json
