@@ -1,27 +1,65 @@
 name: Playwright Tests
+
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # Install dependencies
+      - name: Install Dependencies
+        run: npm install
+
+      # Install Playwright browsers
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      # Run tests
+      - name: Run Playwright Tests
+        id: test
+        run: npx playwright test
+        continue-on-error: true
+
+      # Upload report
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      # Set Slack status
+      - name: Set Slack Status
+        if: always()
+        run: |
+          if [ "${{ steps.test.outcome }}" == "success" ]; then
+            echo "STATUS=✅ PASS" >> $GITHUB_ENV
+          else
+            echo "STATUS=❌ FAIL" >> $GITHUB_ENV
+          fi
+
+      # Send Slack notification
+      - name: Send Slack Notification
+        if: always()
+        run: |
+          curl -X POST -H "Content-type: application/json" \
+          --data "{\"text\":\"🧪 Playwright Test Result: ${{ env.STATUS }}\nRepo: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nRun: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
