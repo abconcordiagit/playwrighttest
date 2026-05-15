@@ -11,16 +11,18 @@ export class HomePage {
 
         this.page = page;
 
-        this.myAccount = page.locator("//span[text()='My account']");
-        this.logoutLink = page.locator("//span[text()='Logout']");
-        this.logoutMessage = page.locator('h1');
+        this.myAccount = page.locator("//a[@data-toggle='dropdown']//span[contains(.,'My account')]");
+        //this.logoutLink = page.locator("//span[text()='Logout']");
+        this.logoutLink = page.getByText("'Logout'");
+        //this.logoutMessage = page.locator('h1');
     }
 
     async logout(): Promise<void> {
 
-        await this.myAccount.click();
+        await this.myAccount.hover();
 
         await this.logoutLink.click();
+        
     }
 
     async verifyLogout(): Promise<void> {
