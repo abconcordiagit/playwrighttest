@@ -44,7 +44,7 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
-          #retention-days: 30
+          retention-days: 30
 
       # Set Slack status
       - name: Set Slack Status
