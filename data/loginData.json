@@ -1,7 +1,7 @@
 [
   {
     "email": "testuser-1@gmail.com",
-    "password": "Password123"
+    "password": "${{ secrets.APP_PASSWORD }}"
   },
   {
     "email": "testuser-2@gmail.com",
